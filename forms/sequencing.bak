@@ -1,0 +1,22 @@
+;; Sequencing
+
+;; lambda with begin
+(define print3
+  (lambda (x y z)
+    (begin
+      (display x)
+      (display "-")
+      (display y)
+      (display "-")
+      (display z)
+      (newline))))
+
+;; lambda without begin
+(define print3
+  (lambda (x y z)
+      (display x)
+      (display "-")
+      (display y)
+      (display "-")
+      (display z)
+      (newline)))

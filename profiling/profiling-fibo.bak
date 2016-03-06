@@ -1,0 +1,4 @@
+(define (fibo n)
+  (cond ((<= n 2) 1)
+        ()
+        ))
