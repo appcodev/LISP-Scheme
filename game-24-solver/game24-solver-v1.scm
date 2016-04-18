@@ -84,13 +84,50 @@
                  (cal-all state pair (cdr lst-op))))))
 
 ;; one operator
+;; ex. case 4 numbers
+;; state = ((5 4 4 2)()())
+;; pairs = (((5 4) (5 2) (4 4) (4 2)))
+;; pair  = (5 4)
+;; op    = +
+;; > (cal-op '((5 4 4 2)()()) '(5 4) '+)
+;; (((4 2) (9) ((5 + 4))))
+
+;; ex. case 2 numbers
+;; state = ((4 2)(1)((5 - 4)))
+;; pairs = ((4 1)(2 1))
+;; pair  = (4 1)
+;; op    = +
+;; >  (cal-op '((4 2)(1)((5 - 4))) '(4 1) '+)
+;; (((2) (5) ((4 + (5 - 4)))))
+
+;; ex. case 1 number
+;; > (cal-op '((2) (5) ((4 + (5 - 4)))) '(5 2) '+)
+;; ((() (7) (((4 + (5 - 4)) + 2))))
+
 (define (cal-op state pair op)
-  (let ((rs (apply (symbol->operator op) pair)))
+  (let ((rs (apply (symbol->operator op) pair))
+        (nums (length (car state))))
     (if (integer? rs)
-        (list (list (remove-all (car state) 
-                                (remove-all pair (cadr state)))
-                    (list (apply (symbol->operator op) pair))
-                    (list (list (car pair) op (cadr pair)))))
+        (cond ((= nums 4)
+               ;; for 4 numbers
+               (list (list (remove-all (car state) 
+                                       (remove-all pair (cadr state)))
+                           (list (apply (symbol->operator op) pair))
+                           (list (list (car pair) op (cadr pair))))))
+              ((or (= nums 2) (= nums 1))
+               ;; for 2 and 1 number(s)
+               (let* ((new-num (car (remove-all pair (cadr state))))
+                     (add-front? (> new-num (caadr state))))
+                 ;; let* body
+                 (list (list (remove-all (car state) 
+                                         (remove-all pair (cadr state)))
+                             (list (apply (symbol->operator op) pair))
+                             (if add-front?
+                                 (list (list new-num op (caaddr state)))
+                                 (list (list (caaddr state) op new-num)))
+                             ))))
+              (else '()))
+        ;; else rs isn't an integer.
         '())))
 
 ;; pair index 0 to n-1
